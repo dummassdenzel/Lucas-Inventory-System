@@ -15,7 +15,7 @@
         sku: '',
         quantity: 0,
         minQuantity: 0,
-        categoryId: ''
+        categoryId: 0
     });
 
     onMount(async () => {
@@ -51,7 +51,7 @@
                 sku: '',
                 quantity: 0,
                 minQuantity: 0,
-                categoryId: ''
+                categoryId: 0
             };
         }
         showForm = true;
@@ -63,6 +63,7 @@
                 ? `/api/products/${editingProduct.id}`
                 : '/api/products';
             
+
             const response = await fetch(url, {
                 method: editingProduct ? 'PUT' : 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -95,6 +96,12 @@
             console.error(err);
         }
     }
+
+    function getCategoryName(categoryId: number | null) {
+        if (!categoryId) return 'Uncategorized';
+        const category = categories.find((c:any) => c.id === categoryId);
+        return category ? category.name : 'Uncategorized';
+    }
 </script>
 
 <div class="space-y-6">
@@ -121,6 +128,7 @@
                 <thead class="bg-gray-50">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SKU</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
@@ -133,6 +141,9 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm font-medium text-gray-900">{product.name}</div>
                                 <div class="text-sm text-gray-500">{product.description}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">{getCategoryName(product.categoryId)}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {product.sku}
@@ -163,7 +174,7 @@
                         </tr>
                     {:else}
                         <tr>
-                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">
+                            <td colspan="6" class="px-6 py-4 text-center text-gray-500">
                                 No products available
                             </td>
                         </tr>
@@ -201,6 +212,19 @@
                         required
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                     />
+                </div>
+
+                <div>
+                    <label for="category" class="block text-sm font-medium text-gray-700">Category</label>
+                    <select
+                        id="category"
+                        bind:value={formData.categoryId}
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <option value="">Select a category</option>
+                        {#each categories as category}
+                            <option value={category.id}>{category.name}</option>
+                        {/each}
+                    </select>
                 </div>
 
                 <div>
